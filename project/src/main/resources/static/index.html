@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduTrack - Hệ Thống Theo Dõi Tiến Độ Học Tập</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dark-theme">
+
+    <!-- 1. AUTH MODAL COMPONENT -->
+    <div id="auth-modal-container">
+        <div id="auth-modal" class="modal-overlay active">
+            <div class="auth-card glass-panel">
+                <div class="auth-header">
+                    <div class="brand-logo">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <span>EduTrack</span>
+                    </div>
+                    <h2 id="auth-title">Chào mừng trở lại!</h2>
+                    <p id="auth-subtitle">Đăng nhập để tiếp tục theo dõi lộ trình học tập của bạn</p>
+                </div>
+
+                <!-- Login Form -->
+                <form id="login-form" class="auth-form">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-user"></i> Tên đăng nhập hoặc Email</label>
+                        <input type="text" id="login-username" placeholder="Nhập username hoặc email..." required value="demo">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-key"></i> Mật khẩu</label>
+                        <input type="password" id="login-password" placeholder="Nhập mật khẩu..." required value="123456">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-right-to-bracket"></i> Đăng Nhập</button>
+                    </div>
+                    <div class="auth-switch">
+                        Chưa có tài khoản? <a href="#" id="switch-to-register">Đăng ký ngay</a>
+                    </div>
+                </form>
+
+                <!-- Register Form -->
+                <form id="register-form" class="auth-form hidden">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-user"></i> Tên đăng nhập</label>
+                        <input type="text" id="reg-username" placeholder="Ví dụ: student123..." required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-envelope"></i> Địa chỉ Email</label>
+                        <input type="email" id="reg-email" placeholder="student@gmail.com..." required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-id-card"></i> Họ và Tên</label>
+                        <input type="text" id="reg-fullname" placeholder="Nguyễn Văn A..." required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-lock"></i> Mật khẩu</label>
+                        <input type="password" id="reg-password" placeholder="Ít nhất 6 ký tự..." required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success btn-block"><i class="fa-solid fa-user-plus"></i> Tạo Tài Khoản</button>
+                    </div>
+                    <div class="auth-switch">
+                        Đã có tài khoản? <a href="#" id="switch-to-login">Đăng nhập</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. MAIN APP CONTAINER -->
+    <div id="app-container" class="app-layout hidden">
+        
+        <!-- SIDEBAR COMPONENT -->
+        <div id="sidebar-container">
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <div class="brand">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <h2>EduTrack</h2>
+                    </div>
+                </div>
+                
+                <nav class="sidebar-nav">
+                    <a href="#dashboard" class="nav-item active" data-tab="dashboard">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Tổng Quan</span>
+                    </a>
+                    <a href="#classrooms" class="nav-item" data-tab="classrooms">
+                        <i class="fa-solid fa-users-rectangle"></i>
+                        <span>Lớp Học</span>
+                    </a>
+                    <a href="#courses" class="nav-item" data-tab="courses">
+                        <i class="fa-solid fa-book-open"></i>
+                        <span>Môn Học</span>
+                    </a>
+                    <a href="#tasks" class="nav-item" data-tab="tasks">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>Bài Tập & Nhiệm Vụ</span>
+                    </a>
+                    <a href="#studylogs" class="nav-item" data-tab="studylogs">
+                        <i class="fa-solid fa-stopwatch"></i>
+                        <span>Pomodoro & Nhật Ký</span>
+                    </a>
+                </nav>
+
+                <div class="sidebar-footer">
+                    <div class="theme-toggle" id="theme-toggle-btn">
+                        <i class="fa-solid fa-moon"></i>
+                        <span>Giao diện tối</span>
+                    </div>
+                    <div class="user-badge glass-panel">
+                        <div class="avatar"><i class="fa-solid fa-user-graduate"></i></div>
+                        <div class="user-info">
+                            <span id="user-display-name">Sinh Viên</span>
+                            <small id="user-display-email">demo@student.edu.vn</small>
+                        </div>
+                        <button id="logout-btn" title="Đăng xuất" class="btn-icon"><i class="fa-solid fa-right-from-bracket"></i></button>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            
+            <!-- TOP BAR -->
+            <header class="topbar glass-panel">
+                <div class="page-title">
+                    <h1 id="current-page-heading">Dashboard Tổng Quan</h1>
+                    <p id="current-page-sub">Thống kê tiến độ và lịch trình học tập real-time</p>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-primary" id="quick-add-course-btn">
+                        <i class="fa-solid fa-plus"></i> Thêm Môn Học
+                    </button>
+                    <button class="btn btn-secondary" id="quick-add-task-btn">
+                        <i class="fa-solid fa-plus"></i> Thêm Bài Tập
+                    </button>
+                </div>
+            </header>
+
+            <!-- TAB 1: DASHBOARD OVERVIEW -->
+            <section id="tab-dashboard" class="tab-page active">
+                <div class="stats-grid">
+                    <div class="stat-card glass-panel border-indigo">
+                        <div class="stat-icon bg-indigo"><i class="fa-solid fa-book"></i></div>
+                        <div class="stat-details">
+                            <span class="stat-label">Tổng Số Môn Học</span>
+                            <h3 id="stat-total-courses">0</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-panel border-emerald">
+                        <div class="stat-icon bg-emerald"><i class="fa-solid fa-check-double"></i></div>
+                        <div class="stat-details">
+                            <span class="stat-label">Bài Tập Hoàn Thành</span>
+                            <h3 id="stat-completed-tasks">0 / 0</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-panel border-amber">
+                        <div class="stat-icon bg-amber"><i class="fa-solid fa-clock"></i></div>
+                        <div class="stat-details">
+                            <span class="stat-label">Tổng Giờ Đã Học</span>
+                            <h3 id="stat-study-hours">0h</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-panel border-rose">
+                        <div class="stat-icon bg-rose"><i class="fa-solid fa-chart-line"></i></div>
+                        <div class="stat-details">
+                            <span class="stat-label">Tiến Độ Trung Bình</span>
+                            <h3 id="stat-overall-progress">0%</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-2-col gap-lg">
+                    <div class="card glass-panel">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-chart-bar"></i> Tiến Độ Theo Môn Học (%)</h3>
+                        </div>
+                        <div class="card-body chart-container">
+                            <canvas id="courseProgressChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card glass-panel">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-chart-pie"></i> Phân Phối Trạng Thái Bài Tập</h3>
+                        </div>
+                        <div class="card-body chart-container">
+                            <canvas id="taskStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-2-col gap-lg margin-top-lg">
+                    <div class="card glass-panel">
+                        <div class="card-header flex-between">
+                            <h3><i class="fa-solid fa-book-bookmark"></i> Môn Học Đang Học</h3>
+                            <a href="#courses" class="link-btn switch-tab" data-target="courses">Xem tất cả <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                        <div class="card-body">
+                            <div id="recent-courses-list" class="courses-mini-list"></div>
+                        </div>
+                    </div>
+                    <div class="card glass-panel">
+                        <div class="card-header flex-between">
+                            <h3><i class="fa-solid fa-calendar-day"></i> Nhiệm Vụ Sắp Tới Deadline</h3>
+                            <a href="#tasks" class="link-btn switch-tab" data-target="tasks">Xem tất cả <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                        <div class="card-body">
+                            <div id="upcoming-tasks-list" class="tasks-mini-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB CLASSROOMS -->
+            <section id="tab-classrooms" class="tab-page">
+                <div class="section-header flex-between">
+                    <h2>Quản Lý Lớp Học & Phòng Học</h2>
+                    <button class="btn btn-primary" onclick="openClassroomModal()">
+                        <i class="fa-solid fa-plus"></i> Thêm Lớp Học Mới
+                    </button>
+                </div>
+                <div id="classrooms-grid" class="courses-grid margin-top-md"></div>
+                <div id="classroom-modal" class="modal-overlay">
+                    <div class="modal-card glass-panel">
+                        <div class="modal-header">
+                            <h3 id="classroom-modal-title">Thêm Lớp Học Mới</h3>
+                            <button class="btn-close" onclick="closeClassroomModal()">&times;</button>
+                        </div>
+                        <form id="classroom-form">
+                            <input type="hidden" id="classroom-id">
+                            <div class="form-group">
+                                <label>Tên Lớp Học *</label>
+                                <input type="text" id="classroom-name" class="form-input" placeholder="Ví dụ: Lập Trình Java Nâng Cao - Nhóm 01" required>
+                            </div>
+                            <div class="grid-2-col gap-sm">
+                                <div class="form-group">
+                                    <label>Mã Lớp Học *</label>
+                                    <input type="text" id="classroom-code" class="form-input" placeholder="Ví dụ: JAVA2026_01" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Phòng Học</label>
+                                    <input type="text" id="classroom-room" class="form-input" placeholder="Ví dụ: A2-501">
+                                </div>
+                            </div>
+                            <div class="grid-2-col gap-sm">
+                                <div class="form-group">
+                                    <label>Giảng Viên Phụ Trách</label>
+                                    <input type="text" id="classroom-teacher" class="form-input" placeholder="Ví dụ: TS. Nguyễn Văn B">
+                                </div>
+                                <div class="form-group">
+                                    <label>Học Kỳ</label>
+                                    <input type="text" id="classroom-semester" class="form-input" value="HK1 - 2026">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Mô Tả Lớp Học</label>
+                                <textarea id="classroom-description" class="form-input" rows="2" placeholder="Chi tiết lịch học, môn học..."></textarea>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn btn-secondary" onclick="closeClassroomModal()">Hủy</button>
+                                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Lưu Lớp Học</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: COURSES MANAGEMENT -->
+            <section id="tab-courses" class="tab-page">
+                <div class="section-header flex-between">
+                    <h2>Danh Sách Môn Học Khoá Học</h2>
+                    <button class="btn btn-primary" onclick="openCourseModal()">
+                        <i class="fa-solid fa-plus"></i> Thêm Môn Học Mới
+                    </button>
+                </div>
+                <div id="courses-grid" class="courses-grid margin-top-md"></div>
+                <div id="course-modal" class="modal-overlay">
+                    <div class="modal-card glass-panel">
+                        <div class="modal-header">
+                            <h3 id="course-modal-title">Thêm Môn Học Mới</h3>
+                            <button class="btn-close" onclick="closeCourseModal()">&times;</button>
+                        </div>
+                        <form id="course-form">
+                            <input type="hidden" id="course-id">
+                            <div class="form-group">
+                                <label>Tên Môn Học / Khóa Học *</label>
+                                <input type="text" id="course-title" class="form-input" placeholder="Ví dụ: Lập trình Java Spring Boot" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Phân Loại / Môn Học *</label>
+                                <input type="text" id="course-category" class="form-input" placeholder="CNTT, Ngoại Ngữ, Toán Học..." required>
+                            </div>
+                            <div class="form-group">
+                                <label>Mô Tả Khóa Học</label>
+                                <textarea id="course-description" class="form-input" rows="3" placeholder="Chi tiết nội dung học..."></textarea>
+                            </div>
+                            <div class="grid-2-col gap-sm">
+                                <div class="form-group">
+                                    <label>Mục Tiêu Deadline</label>
+                                    <input type="date" id="course-target-date" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label>Màu Sắc Nhận Diện</label>
+                                    <input type="color" id="course-color" class="form-input-color" value="#6366f1">
+                                </div>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn btn-secondary" onclick="closeCourseModal()">Hủy</button>
+                                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Lưu Môn Học</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: TASKS & KANBAN -->
+            <section id="tab-tasks" class="tab-page">
+                <div class="section-header flex-between">
+                    <h2>Bảng Quản Lý Bài Tập (Kanban Board)</h2>
+                    <div class="header-actions">
+                        <select id="task-course-filter" class="form-select">
+                            <option value="">-- Tất cả môn học --</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="openTaskModal()">
+                            <i class="fa-solid fa-plus"></i> Thêm Bài Tập
+                        </button>
+                    </div>
+                </div>
+                <div class="kanban-board margin-top-md">
+                    <div class="kanban-column glass-panel">
+                        <div class="kanban-column-header col-todo">
+                            <span class="column-title"><i class="fa-regular fa-circle"></i> Cần Làm</span>
+                            <span class="badge" id="count-todo">0</span>
+                        </div>
+                        <div class="kanban-list" id="list-todo"></div>
+                    </div>
+                    <div class="kanban-column glass-panel">
+                        <div class="kanban-column-header col-progress">
+                            <span class="column-title"><i class="fa-solid fa-spinner fa-spin"></i> Đang Làm</span>
+                            <span class="badge" id="count-progress">0</span>
+                        </div>
+                        <div class="kanban-list" id="list-progress"></div>
+                    </div>
+                    <div class="kanban-column glass-panel">
+                        <div class="kanban-column-header col-completed">
+                            <span class="column-title"><i class="fa-regular fa-circle-check"></i> Hoàn Thành</span>
+                            <span class="badge" id="count-completed">0</span>
+                        </div>
+                        <div class="kanban-list" id="list-completed"></div>
+                    </div>
+                </div>
+                <div id="task-modal" class="modal-overlay">
+                    <div class="modal-card glass-panel">
+                        <div class="modal-header">
+                            <h3 id="task-modal-title">Thêm Bài Tập / Nhiệm Vụ Mới</h3>
+                            <button class="btn-close" onclick="closeTaskModal()">&times;</button>
+                        </div>
+                        <form id="task-form">
+                            <input type="hidden" id="task-id">
+                            <div class="form-group">
+                                <label>Chọn Môn Học *</label>
+                                <select id="task-course-id" class="form-select" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Tên Bài Tập / Nội Dung Nhiệm Vụ *</label>
+                                <input type="text" id="task-title" class="form-input" placeholder="Ví dụ: Đọc chương 3 và hoàn thành bài tập 1..." required>
+                            </div>
+                            <div class="grid-2-col gap-sm">
+                                <div class="form-group">
+                                    <label>Mức Độ Ưu Tiên</label>
+                                    <select id="task-priority" class="form-select">
+                                        <option value="HIGH">Cao (High)</option>
+                                        <option value="MEDIUM" selected>Trung bình (Medium)</option>
+                                        <option value="LOW">Thấp (Low)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Trạng Thái</label>
+                                    <select id="task-status" class="form-select">
+                                        <option value="TODO">Cần Làm (TODO)</option>
+                                        <option value="IN_PROGRESS">Đang Làm (IN_PROGRESS)</option>
+                                        <option value="COMPLETED">Hoàn Thành (COMPLETED)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid-2-col gap-sm">
+                                <div class="form-group">
+                                    <label>Dự Kiến (Giờ)</label>
+                                    <input type="number" id="task-estimated-hours" class="form-input" step="0.5" min="0.5" value="1.0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Hạn Nộp (Deadline)</label>
+                                    <input type="date" id="task-due-date" class="form-input">
+                                </div>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn btn-secondary" onclick="closeTaskModal()">Hủy</button>
+                                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Lưu Nhiệm Vụ</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: POMODORO & STUDY LOGS -->
+            <section id="tab-studylogs" class="tab-page">
+                <div class="grid-2-col gap-lg">
+                    <div class="card glass-panel pomodoro-card">
+                        <div class="card-header text-center">
+                            <h2><i class="fa-solid fa-stopwatch"></i> Đồng Hồ Đếm Giờ Học (Pomodoro)</h2>
+                            <p>Tập trung học tập 25 phút chuyên sâu</p>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="timer-display" id="pomodoro-timer">25:00</div>
+                            <div class="timer-controls margin-top-md">
+                                <button id="pomo-start-btn" class="btn btn-lg btn-success"><i class="fa-solid fa-play"></i> Bắt đầu</button>
+                                <button id="pomo-pause-btn" class="btn btn-lg btn-warning" disabled><i class="fa-solid fa-pause"></i> Tạm dừng</button>
+                                <button id="pomo-reset-btn" class="btn btn-lg btn-secondary"><i class="fa-solid fa-rotate-left"></i> Đặt lại</button>
+                            </div>
+                            <form id="log-session-form" class="margin-top-lg text-left">
+                                <h3><i class="fa-solid fa-pen-to-square"></i> Lưu Nhật Ký Học Tập</h3>
+                                <div class="form-group margin-top-sm">
+                                    <label>Chọn Bài Tập Vừa Học (Không bắt buộc)</label>
+                                    <select id="log-task-id" class="form-select">
+                                        <option value="">-- Tự học / Đọc sách / Không gán task --</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Thời Gian Học (Phút)</label>
+                                    <input type="number" id="log-duration" class="form-input" min="1" value="25" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Ghi Chú Tiến Độ / Nội Dung Học Được</label>
+                                    <textarea id="log-notes" class="form-input" rows="2" placeholder="Hôm nay đã nắm vững kiến thức về..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-floppy-disk"></i> Lưu Vào Lịch Sử Học Tập</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card glass-panel">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-clock-rotate-left"></i> Lịch Sử Nhật Ký Học Tập</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="custom-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Thời Gian</th>
+                                            <th>Bài Tập</th>
+                                            <th>Số Phút</th>
+                                            <th>Ghi Chú</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="studylogs-table-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container"></div>
+
+    <!-- MAIN APP JAVASCRIPT -->
+    <script>
+        if (window.location.protocol === 'file:') {
+            document.body.innerHTML = '<div style="padding: 50px; text-align: center; font-family: sans-serif; color: #ef4444;"><h2>⚠️ Vui lòng không double-click mở trực tiếp file index.html!</h2><p style="color: #94a3b8; font-size: 1.1rem; margin-top: 10px;">Trình duyệt sẽ chặn ES6 Modules và fetch() khi mở file trực tiếp.</p><p style="margin-top: 20px; font-size: 1.2rem; color: #6366f1;">👉 Hãy mở trình duyệt và truy cập địa chỉ: <strong>http://localhost:8080</strong></p></div>';
+        }
+    </script>
+    <script type="module" src="/js/app.js"></script>
+</body>
+</html>

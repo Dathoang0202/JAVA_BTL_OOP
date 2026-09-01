@@ -1,0 +1,49 @@
+/* ==========================================================================
+   APP MAIN LAYOUT, TOPBAR & RESPONSIVE
+   ========================================================================== */
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 260px;
+    padding: 32px;
+    max-width: 1400px;
+}
+
+/* TOPBAR */
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 28px;
+    margin-bottom: 28px;
+}
+.page-title h1 { font-size: 1.6rem; }
+.page-title p { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; }
+.topbar-actions { display: flex; gap: 12px; }
+
+/* TAB PAGES */
+.tab-page { display: none; animation: fadeIn 0.3s ease; }
+.tab-page.active { display: block; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.card { padding: 24px; }
+.card-header h3 { font-size: 1.15rem; display: flex; align-items: center; gap: 10px; }
+.chart-container { position: relative; height: 280px; width: 100%; margin-top: 16px; }
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+    .sidebar { width: 80px; padding: 16px 8px; }
+    .sidebar-header .brand h2, .sidebar-nav span, .theme-toggle span, .user-badge .user-info { display: none; }
+    .main-content { margin-left: 80px; padding: 20px; }
+    .grid-2-col { grid-template-columns: 1fr; }
+}

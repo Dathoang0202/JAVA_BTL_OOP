@@ -1,0 +1,91 @@
+/* ==========================================================================
+   SIDEBAR LAYOUT
+   ========================================================================== */
+
+.sidebar {
+    width: 260px;
+    background: var(--bg-glass);
+    backdrop-filter: blur(16px);
+    border-right: 1px solid var(--border-glass);
+    display: flex;
+    flex-direction: column;
+    padding: 24px 16px;
+    position: fixed;
+    height: 100vh;
+    z-index: 100;
+}
+.sidebar-header .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.3rem;
+    color: var(--primary);
+    padding: 0 12px 24px 12px;
+    border-bottom: 1px solid var(--border-glass);
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 24px;
+    flex: 1;
+}
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: var(--transition);
+}
+.nav-item:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.05);
+}
+.nav-item.active {
+    color: #fff;
+    background: var(--primary);
+    box-shadow: var(--shadow-glow);
+}
+
+.sidebar-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: var(--transition);
+    background: rgba(255, 255, 255, 0.03);
+}
+.theme-toggle:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.08); }
+
+.user-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+}
+.user-badge .avatar {
+    width: 36px; height: 36px;
+    background: var(--primary);
+    border-radius: var(--radius-full);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+}
+.user-badge .user-info { flex: 1; overflow: hidden; }
+.user-badge .user-info span { display: block; font-weight: 600; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-badge .user-info small { color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
