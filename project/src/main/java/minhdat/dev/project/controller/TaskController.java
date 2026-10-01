@@ -1,13 +1,11 @@
 package minhdat.dev.project.controller;
 
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import minhdat.dev.project.config.AuthInterceptor;
 import minhdat.dev.project.dto.ApiResponse;
 import minhdat.dev.project.dto.TaskDto;
 import minhdat.dev.project.dto.UserResponse;
 import minhdat.dev.project.service.TaskService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,14 +35,14 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<TaskDto>> createTask(@Valid @RequestBody TaskDto dto, HttpSession session) {
+    public ResponseEntity<ApiResponse<TaskDto>> createTask(@RequestBody TaskDto dto, HttpSession session) {
         UserResponse user = AuthInterceptor.getLoggedInUser(session);
         TaskDto created = taskService.createTask(dto, user.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("Tạo nhiệm vụ thành công", created));
+        return ResponseEntity.ok(ApiResponse.success("Tạo nhiệm vụ thành công", created));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<TaskDto>> updateTask(@PathVariable Long id, @Valid @RequestBody TaskDto dto, HttpSession session) {
+    public ResponseEntity<ApiResponse<TaskDto>> updateTask(@PathVariable Long id, @RequestBody TaskDto dto, HttpSession session) {
         UserResponse user = AuthInterceptor.getLoggedInUser(session);
         TaskDto updated = taskService.updateTask(id, dto, user.getId());
         return ResponseEntity.ok(ApiResponse.success("Cập nhật nhiệm vụ thành công", updated));
