@@ -5,10 +5,10 @@ import minhdat.dev.project.entity.StudyLog;
 import minhdat.dev.project.entity.Task;
 import minhdat.dev.project.repository.StudyLogRepository;
 import minhdat.dev.project.repository.TaskRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class StudyLogService {
@@ -26,7 +26,17 @@ public class StudyLogService {
         return logs.stream().map(this::mapToStudyLogDto).toList();
     }
 
+    @Transactional
     public StudyLogDto addStudyLog(StudyLogDto dto, Long userId) {
+        if (dto.getDurationMinutes() == null || dto.getDurationMinutes() <= 0) {
+            throw new IllegalArgumentException("Thời gian học phải lớn hơn 0 phút");
+        }
+        Task task = null;
+        if (dto.getTaskId() != null) {
+            task = taskRepository.findByIdAndUserId(dto.getTaskId(), userId)
+                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy nhiệm vụ liên kết"));
+        }
+
         StudyLog log = new StudyLog();
         log.setUserId(userId);
         log.setTaskId(dto.getTaskId());
@@ -36,14 +46,10 @@ public class StudyLogService {
         StudyLog saved = studyLogRepository.save(log);
 
         // Update task spent hours if taskId is provided
-        if (dto.getTaskId() != null) {
-            Optional<Task> optionalTask = taskRepository.findByIdAndUserId(dto.getTaskId(), userId);
-            if (optionalTask.isPresent()) {
-                Task task = optionalTask.get();
-                double addedHours = dto.getDurationMinutes() / 60.0;
-                task.setSpentHours((task.getSpentHours() != null ? task.getSpentHours() : 0.0) + addedHours);
-                taskRepository.save(task);
-            }
+        if (task != null) {
+            double addedHours = dto.getDurationMinutes() / 60.0;
+            task.setSpentHours((task.getSpentHours() != null ? task.getSpentHours() : 0.0) + addedHours);
+            taskRepository.save(task);
         }
 
         return mapToStudyLogDto(saved);
@@ -59,7 +65,7 @@ public class StudyLogService {
         dto.setLogDate(log.getLogDate());
 
         if (log.getTaskId() != null) {
-            taskRepository.findById(log.getTaskId())
+            taskRepository.findByIdAndUserId(log.getTaskId(), log.getUserId())
                     .ifPresent(task -> dto.setTaskTitle(task.getTitle()));
         }
 

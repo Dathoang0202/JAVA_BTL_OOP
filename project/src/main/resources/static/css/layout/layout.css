@@ -24,8 +24,6 @@
 }
 .page-title h1 { font-size: 1.6rem; }
 .page-title p { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; }
-.topbar-actions { display: flex; gap: 12px; }
-
 /* TAB PAGES */
 .tab-page { display: none; animation: fadeIn 0.3s ease; }
 .tab-page.active { display: block; }

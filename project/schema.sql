@@ -85,7 +85,7 @@ INSERT IGNORE INTO `classrooms` (`id`, `name`, `class_code`, `description`, `tea
 (2, 'Cơ Sở Dữ Liệu MySQL - Nhóm 02', 'SQL2026_02', 'Lớp thực hành thiết kế CSDL & MySQL Workbench', 'ThS. Trần Thị C', 'B1-302', 'HK1 - 2026');
 
 INSERT IGNORE INTO `users` (`id`, `username`, `email`, `password`, `full_name`, `role`) 
-VALUES (1, 'demo', 'demo@student.edu.vn', '$2a$10$E2UPV7a0pLsmc8W51YHQwO4yHwFvY3r2M3A.a4X0J1Q7O8b2mO2WS', 'Nguyễn Văn A', 'STUDENT');
+VALUES (1, 'demo', 'demo@student.edu.vn', '$2a$10$UMP89HP4x0WHWc.5Q4MkmeRw8LtuuN.upVL732tNtyF84IAMhwet6', 'Nguyễn Văn A', 'STUDENT');
 
 INSERT IGNORE INTO `courses` (`id`, `user_id`, `title`, `category`, `description`, `target_date`, `status`, `color`) VALUES
 (1, 1, 'Lập trình Java Spring Boot', 'Công nghệ thông tin', 'Khóa học Spring Boot REST API và Microservices', '2026-10-15', 'IN_PROGRESS', '#6366f1'),

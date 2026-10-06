@@ -103,7 +103,7 @@ export class DashboardComponent {
         if (!container) return;
 
         if (!courses || courses.length === 0) {
-            container.innerHTML = '<p class="text-muted">Chưa có môn học nào. Bấm "Thêm Môn Học" để bắt đầu!</p>';
+            container.innerHTML = '<p class="text-muted">Chưa có môn học nào. Vào tab Môn Học để thêm môn học đầu tiên.</p>';
             return;
         }
 

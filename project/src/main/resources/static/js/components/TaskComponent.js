@@ -16,6 +16,8 @@ export class TaskComponent {
 
     static init() {
         TaskComponent.initListeners();
+        window.openTaskModal = () => TaskComponent.openModal();
+        window.closeTaskModal = () => TaskComponent.closeModal();
         window.changeTaskStatus = (id, status) => TaskComponent.changeTaskStatus(id, status);
         window.deleteTask = (id) => TaskComponent.deleteTask(id);
     }
@@ -24,11 +26,14 @@ export class TaskComponent {
         try {
             const filterEl = document.getElementById('task-course-filter');
             const filterCourseId = filterEl ? filterEl.value : '';
-            const response = await TaskService.getTasks(filterCourseId);
+            const response = await TaskService.getTasks();
             if (!response || !response.data) return;
 
             TaskComponent.allTasks = response.data;
-            TaskComponent.renderKanbanBoard(TaskComponent.allTasks);
+            const visibleTasks = filterCourseId
+                ? TaskComponent.allTasks.filter(task => String(task.courseId) === filterCourseId)
+                : TaskComponent.allTasks;
+            TaskComponent.renderKanbanBoard(visibleTasks);
             TaskComponent.populateTaskLogSelect(TaskComponent.allTasks);
         } catch (e) {}
     }

@@ -16,6 +16,8 @@ export class CourseComponent {
 
     static init() {
         CourseComponent.initFormListeners();
+        window.openCourseModal = () => CourseComponent.openModal();
+        window.closeCourseModal = () => CourseComponent.closeModal();
         window.editCourse = (id) => CourseComponent.editCourse(id);
         window.deleteCourse = (id) => CourseComponent.deleteCourse(id);
     }
@@ -72,8 +74,10 @@ export class CourseComponent {
         const taskCourseIdSelect = document.getElementById('task-course-id');
         if (!taskCourseFilter || !taskCourseIdSelect) return;
 
+        const selectedFilter = taskCourseFilter.value;
         const options = courses.map(c => `<option value="${c.id}">${Formatters.escapeHtml(c.title)}</option>`).join('');
         taskCourseFilter.innerHTML = '<option value="">-- Tất cả môn học --</option>' + options;
+        if (courses.some(c => String(c.id) === selectedFilter)) taskCourseFilter.value = selectedFilter;
         taskCourseIdSelect.innerHTML = '<option value="" disabled selected>-- Chọn môn học --</option>' + options;
     }
 

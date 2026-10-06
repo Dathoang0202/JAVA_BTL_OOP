@@ -28,6 +28,7 @@ public class ClassroomService {
     }
 
     public ClassroomDto createClassroom(ClassroomDto dto) {
+        validateClassroom(dto);
         if (classroomRepository.existsByClassCode(dto.getClassCode())) {
             throw new IllegalArgumentException("Mã lớp học đã tồn tại trong hệ thống");
         }
@@ -45,6 +46,9 @@ public class ClassroomService {
     }
 
     public ClassroomDto updateClassroom(Long id, ClassroomDto dto) {
+        if (dto.getName() == null || dto.getName().isBlank()) {
+            throw new IllegalArgumentException("Tên lớp học không được để trống");
+        }
         Classroom classroom = classroomRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy lớp học"));
 
@@ -62,6 +66,15 @@ public class ClassroomService {
         Classroom classroom = classroomRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy lớp học"));
         classroomRepository.delete(classroom);
+    }
+
+    private void validateClassroom(ClassroomDto dto) {
+        if (dto.getName() == null || dto.getName().isBlank()) {
+            throw new IllegalArgumentException("Tên lớp học không được để trống");
+        }
+        if (dto.getClassCode() == null || dto.getClassCode().isBlank()) {
+            throw new IllegalArgumentException("Mã lớp học không được để trống");
+        }
     }
 
     public ClassroomDto mapToDto(Classroom classroom) {

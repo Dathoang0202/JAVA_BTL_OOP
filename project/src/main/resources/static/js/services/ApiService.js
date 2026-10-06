@@ -28,7 +28,7 @@ export class ApiService {
                     if (ApiService.onUnauthorizedCallback) {
                         ApiService.onUnauthorizedCallback();
                     }
-                    Toast.show('Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.', 'error');
+                    throw new Error('Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.');
                 }
                 return null;
             }

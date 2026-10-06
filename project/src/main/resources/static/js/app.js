@@ -23,17 +23,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     TaskComponent.init();
     StudyLogComponent.init();
 
-    // 3. Đăng ký Handler giữa các Component
-    NavigationComponent.setModalHandlers(
-        () => CourseComponent.openModal(),
-        () => TaskComponent.openModal()
-    );
-
     const refreshAllData = async () => {
+        await CourseComponent.load();
         await Promise.all([
             DashboardComponent.load(),
             ClassroomComponent.load(),
-            CourseComponent.load(),
             TaskComponent.load(),
             StudyLogComponent.load()
         ]);
@@ -44,6 +38,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     TaskComponent.setOnTaskChanged(refreshAllData);
     StudyLogComponent.setOnLogSaved(refreshAllData);
 
-    // 4. Kiểm tra phiên đăng nhập người dùng
+    // Kiểm tra phiên đăng nhập người dùng
     await AuthComponent.checkSession();
 });

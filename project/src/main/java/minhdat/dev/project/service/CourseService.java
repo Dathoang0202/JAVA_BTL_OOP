@@ -5,6 +5,7 @@ import minhdat.dev.project.entity.Course;
 import minhdat.dev.project.repository.CourseRepository;
 import minhdat.dev.project.repository.TaskRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -13,10 +14,12 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
     private final TaskRepository taskRepository;
+    private final TaskService taskService;
 
-    public CourseService(CourseRepository courseRepository, TaskRepository taskRepository) {
+    public CourseService(CourseRepository courseRepository, TaskRepository taskRepository, TaskService taskService) {
         this.courseRepository = courseRepository;
         this.taskRepository = taskRepository;
+        this.taskService = taskService;
     }
 
     public List<CourseDto> getCoursesByUserId(Long userId) {
@@ -31,6 +34,7 @@ public class CourseService {
     }
 
     public CourseDto createCourse(CourseDto dto, Long userId) {
+        validateCourse(dto);
         Course course = new Course();
         course.setUserId(userId);
         course.setTitle(dto.getTitle());
@@ -45,6 +49,7 @@ public class CourseService {
     }
 
     public CourseDto updateCourse(Long id, CourseDto dto, Long userId) {
+        validateCourse(dto);
         Course course = courseRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy môn học"));
 
@@ -59,10 +64,24 @@ public class CourseService {
         return mapToCourseDto(updated);
     }
 
+    @Transactional
     public void deleteCourse(Long id, Long userId) {
         Course course = courseRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy môn học"));
+        taskService.deleteTasksForCourse(id, userId);
         courseRepository.delete(course);
+    }
+
+    private void validateCourse(CourseDto dto) {
+        if (dto.getTitle() == null || dto.getTitle().isBlank()) {
+            throw new IllegalArgumentException("Tên môn học không được để trống");
+        }
+        if (dto.getStatus() != null && !List.of("IN_PROGRESS", "COMPLETED", "ON_HOLD").contains(dto.getStatus())) {
+            throw new IllegalArgumentException("Trạng thái môn học không hợp lệ");
+        }
+        if (dto.getColor() != null && !dto.getColor().matches("#[0-9a-fA-F]{6}")) {
+            throw new IllegalArgumentException("Màu môn học không hợp lệ");
+        }
     }
 
     public CourseDto mapToCourseDto(Course course) {

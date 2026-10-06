@@ -16,6 +16,8 @@ export class ClassroomComponent {
 
     static init() {
         ClassroomComponent.initFormListeners();
+        window.openClassroomModal = () => ClassroomComponent.openModal();
+        window.closeClassroomModal = () => ClassroomComponent.closeModal();
         window.editClassroom = (id) => ClassroomComponent.editClassroom(id);
         window.deleteClassroom = (id) => ClassroomComponent.deleteClassroom(id);
     }

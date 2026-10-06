@@ -5,7 +5,9 @@ import minhdat.dev.project.entity.Course;
 import minhdat.dev.project.entity.Task;
 import minhdat.dev.project.repository.CourseRepository;
 import minhdat.dev.project.repository.TaskRepository;
+import minhdat.dev.project.repository.StudyLogRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,10 +16,12 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final CourseRepository courseRepository;
+    private final StudyLogRepository studyLogRepository;
 
-    public TaskService(TaskRepository taskRepository, CourseRepository courseRepository) {
+    public TaskService(TaskRepository taskRepository, CourseRepository courseRepository, StudyLogRepository studyLogRepository) {
         this.taskRepository = taskRepository;
         this.courseRepository = courseRepository;
+        this.studyLogRepository = studyLogRepository;
     }
 
     public List<TaskDto> getTasksByUserId(Long userId) {
@@ -31,6 +35,7 @@ public class TaskService {
     }
 
     public TaskDto createTask(TaskDto dto, Long userId) {
+        validateTask(dto);
         Course course = courseRepository.findByIdAndUserId(dto.getCourseId(), userId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy môn học liên kết"));
 
@@ -49,6 +54,7 @@ public class TaskService {
     }
 
     public TaskDto updateTask(Long id, TaskDto dto, Long userId) {
+        validateTask(dto);
         Task task = taskRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy nhiệm vụ"));
 
@@ -64,6 +70,7 @@ public class TaskService {
     }
 
     public TaskDto updateTaskStatus(Long id, String status, Long userId) {
+        validateStatus(status);
         Task task = taskRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy nhiệm vụ"));
 
@@ -72,10 +79,49 @@ public class TaskService {
         return mapToTaskDto(updated);
     }
 
+    @Transactional
     public void deleteTask(Long id, Long userId) {
         Task task = taskRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy nhiệm vụ"));
+        detachStudyLogs(task.getId());
         taskRepository.delete(task);
+    }
+
+    @Transactional
+    public void deleteTasksForCourse(Long courseId, Long userId) {
+        List<Task> tasks = taskRepository.findByCourseIdAndUserIdOrderByIdAsc(courseId, userId);
+        for (Task task : tasks) {
+            detachStudyLogs(task.getId());
+        }
+        taskRepository.deleteAll(tasks);
+    }
+
+    private void detachStudyLogs(Long taskId) {
+        var logs = studyLogRepository.findByTaskId(taskId);
+        logs.forEach(log -> log.setTaskId(null));
+        studyLogRepository.saveAll(logs);
+    }
+
+    private void validateTask(TaskDto dto) {
+        if (dto.getTitle() == null || dto.getTitle().isBlank()) {
+            throw new IllegalArgumentException("Tên nhiệm vụ không được để trống");
+        }
+        if (dto.getPriority() != null && !List.of("HIGH", "MEDIUM", "LOW").contains(dto.getPriority())) {
+            throw new IllegalArgumentException("Mức ưu tiên không hợp lệ");
+        }
+        if (dto.getStatus() != null) validateStatus(dto.getStatus());
+        if (dto.getEstimatedHours() != null && (!Double.isFinite(dto.getEstimatedHours()) || dto.getEstimatedHours() <= 0)) {
+            throw new IllegalArgumentException("Số giờ dự kiến phải lớn hơn 0");
+        }
+        if (dto.getSpentHours() != null && (!Double.isFinite(dto.getSpentHours()) || dto.getSpentHours() < 0)) {
+            throw new IllegalArgumentException("Số giờ đã học không hợp lệ");
+        }
+    }
+
+    private void validateStatus(String status) {
+        if (!List.of("TODO", "IN_PROGRESS", "COMPLETED").contains(status)) {
+            throw new IllegalArgumentException("Trạng thái nhiệm vụ không hợp lệ");
+        }
     }
 
     public TaskDto mapToTaskDto(Task task) {

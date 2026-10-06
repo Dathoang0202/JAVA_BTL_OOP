@@ -1,5 +1,5 @@
 INSERT INTO users (id, username, email, password, full_name, role) 
-VALUES (1, 'demo', 'demo@student.edu.vn', '$2a$10$E2UPV7a0pLsmc8W51YHQwO4yHwFvY3r2M3A.a4X0J1Q7O8b2mO2WS', 'Nguyễn Văn A', 'STUDENT')
+VALUES (1, 'demo', 'demo@student.edu.vn', '$2a$10$UMP89HP4x0WHWc.5Q4MkmeRw8LtuuN.upVL732tNtyF84IAMhwet6', 'Nguyễn Văn A', 'STUDENT')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO courses (id, user_id, title, category, description, target_date, status, color) VALUES
