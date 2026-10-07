@@ -1,18 +1,34 @@
 package minhdat.dev.project.dto;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class TaskDto {
 
     private Long id;
+    @NotNull(message = "Vui lòng chọn môn học")
     private Long courseId;
     private String courseTitle;
     private Long userId;
+    @NotBlank(message = "Tên bài tập không được để trống")
+    @Size(max = 200, message = "Tên bài tập không được vượt quá 200 ký tự")
     private String title;
+    @NotBlank(message = "Vui lòng chọn mức độ ưu tiên")
+    @Pattern(regexp = "HIGH|MEDIUM|LOW", message = "Mức độ ưu tiên không hợp lệ")
     private String priority;
+    @NotBlank(message = "Vui lòng chọn trạng thái nhiệm vụ")
+    @Pattern(regexp = "TODO|IN_PROGRESS|COMPLETED", message = "Trạng thái nhiệm vụ không hợp lệ")
     private String status;
+    @NotNull(message = "Vui lòng nhập số giờ dự kiến")
+    @DecimalMin(value = "0.5", message = "Giờ dự kiến phải từ 0.5 giờ trở lên")
     private Double estimatedHours;
+    @DecimalMin(value = "0.0", message = "Giờ đã học không được âm")
     private Double spentHours;
     private LocalDate dueDate;
     private LocalDateTime createdAt;
